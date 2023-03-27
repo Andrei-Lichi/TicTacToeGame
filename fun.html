@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            margin: 0;
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 98px);
+            grid-gap: 1px;
+            margin: 0 auto;
+            width: 296px;
+        }
+        
+
+
+        .cell {
+            width: 98px;
+            height: 98px;
+            border: 1px solid black;
+            font-size: 72px;
+            text-align: center;
+            line-height: 1;
+            cursor: pointer;
+        }
+        
+        .cell:hover {
+            background-color: #eee;
+        }
+        
+        .status {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .restart {
+            font-size: 24px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+    <title>TicTacToe</title>
+  </head>
+  <body>
+    <h1 class="status"> Play! </h1>
+    <div class="game">
+        <div class="board">
+          <div class="cell" data-cell-index="0"></div>
+          <div class="cell" data-cell-index="1"></div>
+          <div class="cell" data-cell-index="2"></div>
+          <div class="cell" data-cell-index="3"></div>
+          <div class="cell" data-cell-index="4"></div>
+          <div class="cell" data-cell-index="5"></div>
+          <div class="cell" data-cell-index="6"></div>
+          <div class="cell" data-cell-index="7"></div>
+          <div class="cell" data-cell-index="8"></div>
+        </div>
+        <button class="restart-button"> Restart</button>
+    <script>
+          //#region code
+          const winningConditions = [
+          [0, 1, 2],
+          [3, 4, 5],
+          [6, 7, 8],
+          [0, 3, 6],
+          [1, 4, 7],
+          [2, 5, 8],
+          [0, 4, 8],
+          [2, 4, 6],
+        ];
+        let board, currentPlayer, gameOver;
+
+        // Get DOM elements
+        const cells = document.querySelectorAll(".cell");
+        const restartBtn = document.querySelector(".restart-button");
+        const statusText = document.querySelector(".status");
+
+        function startGame() {
+          board = ["", "", "", "", "", "", "", "", ""];
+          currentPlayer = "X";
+          gameOver = false;
+          setStatus(`Player ${currentPlayer}'s turn`);
+          cells.forEach((cell) => {
+            cell.removeEventListener("click", handleClick);
+            cell.addEventListener("click", handleClick, { once: true });
+            cell.innerHTML = "";
+          });
+        }
+
+        function checkWin() {
+          return winningConditions.some((pattern) =>
+            pattern.every((index) => board[index] === currentPlayer)
+          );
+        }
+
+        function isDraw() {
+          return board.every((cell) => cell !== "");
+        }
+
+        function updateCellUI(cell) {
+          cell.innerHTML = currentPlayer;
+        }
+
+        // Function to set status text
+        function setStatus(message) {
+          statusText.innerHTML = message;
+        }
+
+        function updateBoard(index) {
+          const newBoard = [...board];
+          newBoard[index] = currentPlayer;
+          return newBoard;
+        }
+
+        function swapPlayer() {
+          currentPlayer = currentPlayer === "X" ? "O" : "X";
+          setStatus(`Player ${currentPlayer}'s turn`);
+        }
+
+        function handleClick(event) {
+          const cell = event.target;
+          const index = cell.dataset.cellIndex;
+          if (gameOver) return;
+          if (board[index] !== "") return;
+          updateCellUI(cell);
+          board = updateBoard(index);
+
+          if (checkWin()) {
+            setStatus(`Player ${currentPlayer} won!`);
+            gameOver = true;
+          } else if (isDraw()) {
+            setStatus(`It's a draw!`);
+            gameOver = true;
+          } else {
+            swapPlayer();
+          }
+        }
+
+        restartBtn.addEventListener("click", startGame);
+
+        startGame();
+
+        //#endregion
+    </script>  
+    </body>
+</html>
